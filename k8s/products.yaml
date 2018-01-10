@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: products
+  labels:
+    app: products
+spec:
+  selector:
+    app: products
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: products
+  labels:
+    app: products
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+      - image: nameko/nameko-example-products:latest
+        name: nameko-example-products
+        env:
+          - name: REDIS_HOST
+            value: cache-redis
+          - name: REDIS_INDEX
+            value: "11"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cache-redis
+                key: redis-password
+          - name: RABBIT_HOST
+            value: broker-rabbitmq
+          - name: RABBIT_MANAGEMENT_PORT
+            value: "15672"
+          - name: RABBIT_PORT
+            value: "5672"
+          - name: RABBIT_USER
+            value: user
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq
+                key: rabbitmq-password
+      restartPolicy: Always
