@@ -100,7 +100,7 @@ $ helm --kube-context=minikube install --name db --namespace examples stable/pos
 $ helm --kube-context=minikube install --name cache  --namespace examples stable/redis
 ```
 
-RabbitMQ, PostgreSQL and Redis are now installed along with persistent volumes, kubernetes services, config maps and any secrets required a.k.a. `Amazing`!
+RabbitMQ, PostgreSQL and Redis are now installed along with persistent volumes, kubernetes services, config maps and any secrets required a.k.a. `Amazing™`!
 
 Verify all pods are running:
 
