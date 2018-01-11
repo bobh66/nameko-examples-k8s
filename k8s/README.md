@@ -1,11 +1,7 @@
 # Run Nameko Examples on Kubernetes
 
 In this example we'll use local [minikube](https://github.com/kubernetes/minikube)
-instance of Kubernetes hosted on VirtualBox.  
-
-Helm Charts included in this repository should be usable on any Kubernetes cluster instance.  
-
-Tested with Kubernetes v1.8
+Kubernetes instance hosted on VirtualBox. Helm Charts included here should be usable on any Kubernetes cluster instance. Tested with Kubernetes v1.8.
 
 ## Prerequisites
 
@@ -66,9 +62,9 @@ metadata:
 ## Install External Dependencies
 
 Our examples depend on PostgreSQL, Redis and RabbitMQ. 
-The fastest way to install these 3rd party dependencies will be to use community maintained [Helm Charts](https://github.com/kubernetes/charts).
+The fastest way to install these 3rd party dependencies is to use community maintained [Helm Charts](https://github.com/kubernetes/charts).
 
-Let’s initiate Helm’s server side component `Tiller`  
+Let’s install `Tiller` (Helm’s server-side component)
 
 ```sh
 $ helm init --kube-context=minikube
@@ -100,7 +96,7 @@ $ helm --kube-context=minikube install --name db --namespace examples stable/pos
 $ helm --kube-context=minikube install --name cache  --namespace examples stable/redis
 ```
 
-With three steps above RabbitMQ, PostgreSQL and Redis are installed along with persistent volumes, kubernetes services, config maps and any secrets required a.k.a. `Amazing!`
+RabbitMQ, PostgreSQL and Redis are now installed along with persistent volumes, kubernetes services, config maps and any secrets required a.k.a. `Amazing`!
 
 Verify all pods are running:
 
@@ -120,7 +116,7 @@ If this has not been addressed when you read this please follow [these steps](ht
 
 To deploy our example services, we'll have to create Kubernetes deployment definition files. 
 Most of the time (in real world) you would want to use some dynamic data during your deployments e.g. image tags.
-The easiest (best) way to do it is to create Helm Charts for each of our service and use Helm to deploy them. 
+The easiest way to do this is to create Helm Charts for each of our service and use Helm to deploy them. 
 
 Our chars are organized as follows:
 
@@ -155,7 +151,7 @@ Each chart is comprised of:
 `templates` folder where all Kubernetes definition files live.
 
 Please read [The Chart Template Developer’s Guide](https://docs.helm.sh/chart_template_guide/#the-chart-template-developer-s-guide)
-to learn everything there is about creating your own charts.
+to learn about creating your own charts.
 
 All of our charts contain `deployment.yaml` template where main Nameko Service deployment definition lives.  
 `Gateway` chart additionally has definitions for `ingress` and kubernetes `service`
@@ -299,6 +295,6 @@ $ curl 'http://192.168.99.101/orders/1'
 
 ## Wrap-up
 
-Running Nameko services in Kubernetes is really simple. Please get familiar with Helm Charts included in this example and try adding one of yours. 
+Running Nameko services in Kubernetes is really simple. Please get familiar with Helm Charts included in this repository and try adding one of your own. 
 
 Happy microservicing!
