@@ -1,5 +1,7 @@
 # Run Nameko Examples on Kubernetes
 
+![Nameko loves Kubernetes](nameko-k8s.png)
+
 In this example we'll use local [minikube](https://github.com/kubernetes/minikube)
 Kubernetes cluster hosted on VirtualBox along with community Helm Charts to deploy all 3rd party services. We will also create a set of Helm Charts for Nameko Example Services from this repository.  
 
