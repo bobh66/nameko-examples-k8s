@@ -1,7 +1,9 @@
 # Run Nameko Examples on Kubernetes
 
 In this example we'll use local [minikube](https://github.com/kubernetes/minikube)
-Kubernetes instance hosted on VirtualBox. Helm Charts included here should be usable on any Kubernetes cluster instance. Tested with Kubernetes v1.8.
+Kubernetes cluster hosted on VirtualBox along with community Helm Charts to deploy all 3rd party services. We will also create a set of Helm Charts for Nameko Example Services from this repository.  
+
+Tested with Kubernetes v1.8.
 
 ## Prerequisites
 
@@ -12,7 +14,7 @@ Please make sure these are installed and working
 * [Minikube](https://github.com/kubernetes/minikube#installation)
 * [Helm](https://docs.helm.sh/using_helm/#installing-helm)
 
-## Create Kubernetes
+## Create Kubernetes Cluster
 
 Start (create) Minikube:
 
@@ -180,7 +182,9 @@ NOTES:
 Thank you for installing Products Service!
 ```
 
-And repeat the same for `orders` and `gateway`:
+We used `--set image.tag=latest` to set image tag to be used for this release.
+
+Let's release `orders` and `gateway` services:
 
 ```sh
 $ helm upgrade orders charts/orders --install \
@@ -198,7 +202,7 @@ Release "gateway" does not exist. Installing it now.
 (...)
 ```
 
-Let's list all of Helm releases:
+Let's list all of our Helm releases:
 
 ```sh
 $ helm --kube-context=minikube list
@@ -228,10 +232,9 @@ products-66894ff474-5dd2t          1/1       Running   0          5m
 
 ## Run examples
 
-We can now verify our gateway api is working as expected by executing examples 
-from main README
+We can now verify our gateway api is working as expected by executing examples requests from main README.
 
-We will replace `localhost:8003` from our examples with minikube ip
+We will replace `localhost:8003` with minikube IP:
 
 ```sh
 $ minikube ip
