@@ -158,10 +158,9 @@ Please read [The Chart Template Developer’s Guide](https://docs.helm.sh/chart_
 to learn about creating your own charts.
 
 All of our charts contain `deployment.yaml` template where main Nameko Service deployment definition lives.  
-`Gateway` chart additionally has definitions for `ingress` and kubernetes `service`
-which are required to enable inbound traffic.
+`Gateway` chart has additional definitions for `ingress` and kubernetes `service` which are required to enable inbound traffic.
 
-Let's deploy our `products` charts
+Let's deploy our `products` chart:
 
 ```sh
 $ helm upgrade products charts/products --install \
