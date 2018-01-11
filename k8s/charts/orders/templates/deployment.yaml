@@ -1,48 +1,36 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: products
-  labels:
-    app: products
-spec:
-  selector:
-    app: products
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8000
----
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: products
+  name: {{ .Chart.Name }}
   labels:
-    app: products
+    app: {{ .Chart.Name }}
+    tag: {{ .Values.image.tag }}
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: products
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: products
+        app: {{ .Chart.Name }}
     spec:
       containers:
-      - image: nameko/nameko-example-products:latest
-        name: nameko-example-products
+      - image: nameko/nameko-example-orders:{{ .Values.image.tag }}
+        name: {{ .Chart.Name }}
         env:
-          - name: REDIS_HOST
-            value: cache-redis
-          - name: REDIS_INDEX
-            value: "11"
-          - name: REDIS_PORT
-            value: "6379"
-          - name: REDIS_PASSWORD
+          - name: DB_HOST
+            value: db-postgresql
+          - name: DB_NAME
+            value: orders
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: cache-redis
-                key: redis-password
+                name: db-postgresql
+                key: postgres-password
           - name: RABBIT_HOST
             value: broker-rabbitmq
           - name: RABBIT_MANAGEMENT_PORT
