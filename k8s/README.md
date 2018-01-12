@@ -3,7 +3,7 @@
 ![Nameko loves Kubernetes](nameko-k8s.png)
 
 In this example we'll use local [minikube](https://github.com/kubernetes/minikube)
-Kubernetes cluster hosted on VirtualBox along with community Helm Charts to deploy all 3rd party services. We will also create a set of Helm Charts for Nameko Example Services from this repository.  
+Kubernetes cluster hosted on VirtualBox along with community maintained Helm Charts to deploy all 3rd party services. We will also create a set of Helm Charts for Nameko Example Services from this repository.  
 
 Tested with Kubernetes v1.8.
 
@@ -44,8 +44,9 @@ NAME       STATUS    ROLES     AGE       VERSION
 minikube   Ready     <none>    3m        v1.8.0
 ```
 
-Minikube comes with Kubernetes Dashboard turned on:
+Minikube comes with Kubernetes Dashboard addon turned on. You can use it to poke around the cluster. Any information that you can see via dashboard can be as easily obtained with `kubectl` command.  
 
+Start dashboard:  
 `$ minikube dashboard`
 
 ## Create Namespace
@@ -150,15 +151,69 @@ charts
 
 Each chart is comprised of:
 
-`Charts.yaml` file contains a description of the chart.  
-`values.yaml` file contains the default values for a chart that can be overwritten during release.  
+`Charts.yaml` file containing description of the chart.  
+`values.yaml` file containing default values for a chart that can be overwritten during the release..  
 `templates` folder where all Kubernetes definition files live.
+
+All of our charts contain `deployment.yaml` template where main Nameko Service deployment definition lives. `Gateway` chart has additional definitions for `ingress` and kubernetes `service` which are required to enable inbound traffic.
+
+Example of products `deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    tag: {{ .Values.image.tag }}
+    revision: "{{ .Release.Revision }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+      - image: nameko/nameko-example-products:{{ .Values.image.tag }}
+        name: {{ .Chart.Name }}
+        env:
+          - name: REDIS_HOST
+            value: cache-redis
+          - name: REDIS_INDEX
+            value: "11"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cache-redis
+                key: redis-password
+          - name: RABBIT_HOST
+            value: broker-rabbitmq
+          - name: RABBIT_MANAGEMENT_PORT
+            value: "15672"
+          - name: RABBIT_PORT
+            value: "5672"
+          - name: RABBIT_USER
+            value: user
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: broker-rabbitmq
+                key: rabbitmq-password
+      restartPolicy: Always
+
+```
+
+As you can see this template is using values coming from `Chart` and `Values` files as well as dynamic `Release` information. Passwords from secrets created by Redis and RabbitMQ releases are also referenced and passed to a container as `REDIS_PASSWORD` and `RABBIT_PASSWORD` environment variables respectively.
 
 Please read [The Chart Template Developer’s Guide](https://docs.helm.sh/chart_template_guide/#the-chart-template-developer-s-guide)
 to learn about creating your own charts.
-
-All of our charts contain `deployment.yaml` template where main Nameko Service deployment definition lives.  
-`Gateway` chart has additional definitions for `ingress` and kubernetes `service` which are required to enable inbound traffic.
 
 Let's deploy our `products` chart:
 
@@ -183,7 +238,7 @@ NOTES:
 Thank you for installing Products Service!
 ```
 
-We used `--set image.tag=latest` to set image tag to be used for this release.
+We used `--set image.tag=latest` to set custom image tag to be used for this release. You can do the same for any values defined in values.yaml file.
 
 Let's release `orders` and `gateway` services:
 
@@ -300,5 +355,3 @@ $ curl 'http://192.168.99.101/orders/1'
 ## Wrap-up
 
 Running Nameko services in Kubernetes is really simple. Please get familiar with Helm Charts included in this repository and try adding one of your own. 
-
-Happy microservicing!
